@@ -1,6 +1,8 @@
 const inquirer = require('inquirer');
 const { writeFileSync } = require('fs');
 
+const { department, employee, role } = require('')
+
 const path = process.cwd();
 
 
