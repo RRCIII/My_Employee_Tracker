@@ -4,13 +4,15 @@
   "description": "This is a logo generator to that allows the user to input criteria that will generate a logo upon results given from the prompts proposed. With the use of jest, inquirer, and validate-color installed, the code was able to be tested and written to a file to generate a SVG logo.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "index.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "inquirer": "^8.2.4",
+    "jest": "^29.6.4",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.0"
   }
