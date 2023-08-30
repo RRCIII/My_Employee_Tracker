@@ -24,11 +24,19 @@ employees.init(
     role_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'role',
+        key: 'id',
+      },
     },
 
     manager_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'employees',
+        key: 'id',
+      },
     },
     name: {
       type: DataTypes.INTEGER,
