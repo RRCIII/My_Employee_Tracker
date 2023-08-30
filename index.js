@@ -1,12 +1,6 @@
 const inquirer = require('inquirer');
 const path = process.cwd();
 
-// const ValidateInput = (input) => {
-//     if(input=== '') {
-//         return 'Must Add department';
-//     } return true;
-// } 
-
 inquirer
     .prompt([
         {
