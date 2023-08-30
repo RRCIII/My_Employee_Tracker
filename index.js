@@ -1,5 +1,8 @@
 const inquirer = require('inquirer');
+const { writeFileSync } = require('fs');
+
 const path = process.cwd();
+
 
 inquirer
     .prompt([

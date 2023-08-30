@@ -1,10 +1,10 @@
-DROP DATABASE IF EXISTS department;
-CREATE DATABASE IF NOT EXISTS department ;
+DROP DATABASE IF EXISTS department_db;
+CREATE DATABASE IF NOT EXISTS department_db ;
 
-USE department;
 
-CREATE TABLE IF NOT EXISTS department  (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+
+CREATE TABLE IF NOT EXISTS department_db  (
+    id INT NOT NULL PRIMARY KEY, 
     name VARCHAR(30) NOT NULL 
 );
 
@@ -12,14 +12,14 @@ CREATE TABLE IF NOT EXISTS role (
     id INT NOT NULL PRIMARY KEY,
     title VARCHAR(30) IS NOT NULL,
     salary DECIMAL(10,2) NOT NULL,
-    department_id REFERENCES department(id) INT NOT NULL 
+    department_id INT REFERENCES department_db(id) ON DELETE SET NULL 
 ); 
 
-CREATE TABLE employee IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS employee (
     id INT NOT NULL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    role_id INT REFERENCES department_id(id),
-    manager_id REFERNCES employee(id) INT,
+    role_id INT REFERENCES role (id) ON DELETE SET NULL,
+    manager_id INT REFERNCES employee(id) ON DELETE SET NULL,
     name VARCHAR(30) NOT NULL 
 ); 
