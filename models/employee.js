@@ -1,9 +1,9 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/connection");
 
-class employees extends Model {}
+class Employee extends Model {}
 
-employees.init(
+Employee.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,21 +25,21 @@ employees.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'role',
+        model: 'Role',
         key: 'id',
       },
     },
 
     manager_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
-        model: 'employees',
+        model: 'Employee',
         key: 'id',
       },
     },
     name: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -48,11 +48,15 @@ employees.init(
     timestamps: false,
     freezeTableName: true,
     underscored: true,
-    modelName: "employees",
+    modelName: "Employee",
   }
 );
 
-module.exports = employees;
+// Employee.create {(
+
+// )}
+
+module.exports = Employee;
 
 // CREATE TABLE IF NOT EXISTS employee (
 //     id INT NOT NULL PRIMARY KEY,

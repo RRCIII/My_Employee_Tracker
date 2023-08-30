@@ -1,8 +1,10 @@
 const Department = require('./department');
-const Employees = require('./employee');
+const Employee = require('./employee');
 const Role = require('./role');
 
+ Employee.belongsTo(Department, {
+    foreignKey: 'department_id',
+ });
 
 
-
-module.exports = { Department, Employees, Role };
+module.exports = { Department, Employee, Role }

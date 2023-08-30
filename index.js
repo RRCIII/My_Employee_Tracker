@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const { writeFileSync } = require('fs');
 
-const { department, employee, role } = require('')
+const { department, employee, role } = require('./models/index');
 
 const path = process.cwd();
 
@@ -26,7 +26,7 @@ inquirer
         {
             type:"input",
             message: "What is the name of the role?",
-            name: "nameRole"
+            name: "Role"
         },
         {
             type: "input",
