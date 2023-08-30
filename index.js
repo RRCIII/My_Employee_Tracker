@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const path = process.cwd();
 
 // const ValidateInput = (input) => {
 //     if(input=== '') {
@@ -71,12 +72,13 @@ inquirer
         {
             type: "list",
             message:"Which employee's role would you like to update?",
-            name:"empChoices"
+            name:"empChoices",
+            choices: ["me","me","me","me", "me" ,"me" ,"me"]
         }
     ]) 
     
     .then(res => {
-       console.log(`You've entered ${res}`)
+       console.log(`You've entered ${res.name}`)
     });
 
 
