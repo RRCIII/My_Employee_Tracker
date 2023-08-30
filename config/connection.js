@@ -1,12 +1,11 @@
-const Sequalize = require('sequalize');
+const Sequelize = require('sequelize');
 require('dotenv').config();
 
-const sequalize = new Sequalize (
-    {
+const sequelize = new Sequelize (
+    
         process.env.DB,
         process.env.USER, 
-        process.env.PASSWORD
-    },
+        process.env.PASSWORD,
 
     {
         host: 'localhos',
@@ -15,4 +14,4 @@ const sequalize = new Sequalize (
     }
 );
 
-module.exports = sequalize;
+module.exports = sequelize;
