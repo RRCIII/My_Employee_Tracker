@@ -23,6 +23,10 @@ Role.int(
     department_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      reference: {
+        foreignKey: 'Department',
+        onDelete: 'CASCADE',
+      },
     },
   },
   {
@@ -35,13 +39,6 @@ Role.int(
 );
 
 
-// Role.create {(
-
-// )}.then((res) => {
-//   console.log('witten to db', res);
-// }). catch((err) => {
-//   console.log('error when creating table')
-// })
 
 
 
