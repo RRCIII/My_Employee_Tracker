@@ -28,4 +28,6 @@ Role.hasOne(Department, {
 Department.belongsTo(Role, {
     foreignKey: 'department_id'
 });
+
+
 module.exports = { Department, Employee, Role }

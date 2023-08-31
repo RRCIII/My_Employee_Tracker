@@ -25,7 +25,7 @@ Employee.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Role',
+        model: 'role',
         key: 'id',
       },
     },
@@ -34,7 +34,7 @@ Employee.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'Employee',
+        model: 'employee',
         key: 'id',
       },
     },
@@ -48,7 +48,7 @@ Employee.init(
     timestamps: false,
     freezeTableName: true,
     underscored: true,
-    modelName: "Employee",
+    modelName: "employee",
   }
 );
 

@@ -24,17 +24,6 @@ Department.init({
 );
 
 
-// Department.create {(
-
-// )}.then((res) => {
-//   console.log('witten to db', res);
-// }). catch((err) => {
-//   console.log('error when creating table')
-// })
-
-
-
-
 module.exports = Department;
 
 // CREATE TABLE IF NOT EXISTS department_db  (

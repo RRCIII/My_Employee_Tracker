@@ -3,7 +3,7 @@ const sequelize = require("../config/connection");
 
 class Role extends Model {}
 
-Role.int(
+Role.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -24,7 +24,7 @@ Role.int(
       type: DataTypes.INTEGER,
       allowNull: false,
       reference: {
-        foreignKey: 'Department',
+        foreignKey: 'department',
         onDelete: 'CASCADE',
       },
     },
