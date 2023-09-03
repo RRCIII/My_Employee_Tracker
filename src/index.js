@@ -493,8 +493,8 @@ const viewByDepartment = async () => {
 };
 
 // "View total utitilied budget of department"
-const viewBudget = async () => {
-    constquery = `
+const viewBudget = async () => { 
+    const query = `
     SELECT d.name AS department_name, COALESCE(SUM(r.salary), 0) AS total_salary
     FROM department d
     JOIN role r ON d.id = r.department_id
