@@ -131,3 +131,54 @@ const addRole = async () => {
         console.log(err);
     }
 };
+
+//  "Add Employee "
+const addEmployee = async () => {
+    try {
+        const [roles] = await pool.query(`SELECT * FROM role`);
+        const roleTitle = roles.map((role) => role.title).filter(arr => arr != null);
+
+        const [managers] = await pool.query(`SELECT * FROM employee`);
+        const managerName = managers.map(
+            (name) => `${name.first_name} ${name.last_name}`
+        );
+
+        const employee =await inquirer.prompt([
+            {
+                name: "firstname",
+                type: "input",
+                messasge: "First name of the employee:",
+                validate: (first) => {
+                    return first 
+                    ? true 
+                    : console.log("Please enter a first name of the employee", false);
+                },
+            },
+            {
+                name: "lastname",
+                type: "input",
+                messasge: "Last name of the employee:",
+                validate: (last) => {
+                    return last
+                    ? true 
+                    : console.log("Please enter a first name of the employee", false);
+                },
+            },
+            {
+                name: "firstname",
+                type: "input",
+                messasge: "First name of the employee:",
+                choices: [...roleTitle],
+            
+            },
+            {
+                name: "firstname",
+                type: "input",
+                messasge: "First name of the employee:",
+                choices: [managerName],
+            },
+
+        ]);
+        const
+    }
+}

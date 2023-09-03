@@ -3,7 +3,7 @@ DROP DATABASE IF EXISTS employee_tracker_data;
 CREATE DATABASE IF NOT EXISTS employee_tracker_data ;
 USE employee_tracker_data;
 
--- tables created for department, role anf employee 
+-- tables created for department, role, and employee 
 CREATE TABLE department (
     id INT AUTO_INCREMENT, 
     name VACHAR(30),
