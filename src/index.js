@@ -339,3 +339,54 @@ const removeEmployee = async () => {
         console.log(err);
     }
 };
+
+// "Update an employee role"
+const updateRole = async () => {
+    try {
+        const [employeeNames] = await pool.query(`SELECT * FROM employee;`)
+        const selectEmployee = employeeNames.map(
+            (names) => `${names.first_name} ${names.last_name}`
+        );
+
+        const [employeeRoles] = await pool.query(`SELECT * FROM role;`);
+        const selectRole = employeeRoles
+        .map((role) => role.title)
+        .filter((arr) => arr != NULL);
+
+        const data = await inquirer.prompt([
+            {
+                name: "updateEmployee",
+                type: "list",
+                message: "Which employee's role do you want to udate?",
+                choices: [...selectEmployee],
+            },
+            {
+                name: "updateRole",
+                type: "list",
+                message: "Which employee's role do you want to udate?",
+                choices: [...selectRole],
+            },
+         ]);
+         const { updateEmployee, updateRole } = data;
+
+         const updateRoleId = employeeRoles.find(
+            (role) => role.title === updateRole 
+         );
+         const { id } = updateRoleId;
+
+         await pool.query(
+            `
+            UPDATE employee As e SET e.role_id = ?
+            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+            `,
+            [id, updateEmployee]
+         );
+         const [results] =await pool.query(
+            `SELECT * FROM employee JOIN role ON employee.role_id = role.id;`
+         );
+         console.table(results);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
