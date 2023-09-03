@@ -1,5 +1,5 @@
 //  Node packages: inquirer@8.2.4 & mysql2
-const { log } = require("console");
+const { query } = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
@@ -14,13 +14,13 @@ const pool = mysql
     .promise();
 
 // "View All Departments" 
-const viewAllDepartments = async () => {
+const viewDepartments = async () => {
     const [rows] = await pool.query("SELECT * FROM department;");
     console.table(rows)
 };
 
 // "View All Roles"
-const viewAllRoles = async () => {
+const viewRoles = async () => {
     let query = `
     SELECT r.id,
            r.title,
@@ -36,7 +36,7 @@ const viewAllRoles = async () => {
 };
 
 //"View All Employess"
-const viewAllEmployees = async () =>{
+const viewEmployees = async () =>{
     let query = ` 
       SELECT e.id,
              e.first_name,
@@ -75,7 +75,7 @@ const addDepartment = async () => {
             VALUES (?)`,
             [deptAdded]
         );
-        return viewAllDepartments();
+        return viewDepartments();
     } catch (err) {
         console.log(err);
     }
@@ -185,8 +185,9 @@ const addEmployee = async () => {
         const selectedRole = roles.find((role) => role.title === employeeRole);
         const roleId = selectedRole.id 
 
-        const selectedManager = managers.finf(
-            (manager) => `${manager.first_name} ${last_name}` === employeeManager
+        const selectedManager = managers.find(
+            (manager) => 
+            `${manager.first_name} ${manager.last_name}` === employeeManager
 
         );
 
@@ -197,7 +198,7 @@ const addEmployee = async () => {
             VALUES ( ?, ?, ?, ?)`,
             [firstName, lastName, roleId, managerId]
         );
-        return await viewAllEmployees();
+        return await viewEmployees();
     } catch (err) {
         console.log(err);
     }
@@ -211,6 +212,63 @@ const removeDepartment = async () => {
         .map((dept) => dept.name)
         .filter((arr) => arr != null);
 
-        const dept 
+        const dept = await inquirer.prompt({
+            name: "deptRemoved",
+            type: "list",
+            message: "Select a department to remove:",
+            choices: [...deptName],
+        });
+        const { deptRemoved } = dept;
+
+        await pool.query(`UPDATE department SET name = NULL WHERE name = ?;`, [
+            deptRemoved,
+        ]);
+
+        await pool.query(
+        `
+        DELETE FROM department WHERE name = ?;
+        `,
+            [deptRemoved]
+        );
+
+        return await viewDepartments();
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+// "Remove a role"
+const removeRole = async () => {
+    try {
+        const [roles] = await pool.query(`Select * FROM role;`);
+        const roleTitle = roles 
+            .map((role) => role.title)
+            .filter((arr) => arr != null);
+
+        const role = await inquirer.prompt({
+            name: "roleRemoved",
+            type: "list",
+            message: "Select a role to remove:",
+            choices: [...roleTitle],
+        });
+        const { roleRemoved } = role;
+
+        await pool.query (
+            ` UPDATE role
+            SET title= NULL, salary = NULL
+            WHERE title = ?
+            `,
+            [roleRemoved]
+        );
+        return await viewRoles();
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+// "Remove an employee"
+const removeEmployee = async () => {
+    try {
+        const [employees] = await pool.
     }
 }
