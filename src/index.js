@@ -1,4 +1,5 @@
 //  Node packages: inquirer@8.2.4 & mysql2
+const { log } = require("console");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
@@ -80,7 +81,7 @@ const addDepartment = async () => {
     }
 };
 
-// Add a role 
+// "Add a role" 
 const addRole = async () => {
     try {
         const [departments] = await pool.query(`SELECT * FORM department;`);
@@ -161,24 +162,55 @@ const addEmployee = async () => {
                 validate: (last) => {
                     return last
                     ? true 
-                    : console.log("Please enter a first name of the employee", false);
+                    : console.log("Please enter a last of the employee", false);
                 },
             },
             {
-                name: "firstname",
-                type: "input",
-                messasge: "First name of the employee:",
+                name: "employeeRole",
+                type: "list",
+                messasge: "What is the employee's role?:",
                 choices: [...roleTitle],
             
             },
             {
-                name: "firstname",
-                type: "input",
-                messasge: "First name of the employee:",
-                choices: [managerName],
+                name: "employeeManager",
+                type: "list",
+                messasge: "Who is the employee's manager:",
+                choices: [...managerName],
             },
 
         ]);
-        const
+        const {  firstName, lastName, employeeRole, employeeManager } = employee;
+
+        const selectedRole = roles.find((role) => role.title === employeeRole);
+        const roleId = selectedRole.id 
+
+        const selectedManager = managers.finf(
+            (manager) => `${manager.first_name} ${last_name}` === employeeManager
+
+        );
+
+        const managerId = selectedManager.id;
+
+        await pool.query(
+            `INSERT INTO employee (first_name, last_name, role_name, manager_id)
+            VALUES ( ?, ?, ?, ?)`,
+            [firstName, lastName, roleId, managerId]
+        );
+        return await viewAllEmployees();
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+//"Remove a department"
+const removeDepartment = async () => {
+    try {
+        const [departments] = await pool.query(`SELECT * FROM department;`);
+        const deptName = departments 
+        .map((dept) => dept.name)
+        .filter((arr) => arr != null);
+
+        const dept 
     }
 }
