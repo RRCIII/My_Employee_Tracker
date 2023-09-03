@@ -269,6 +269,73 @@ const removeRole = async () => {
 // "Remove an employee"
 const removeEmployee = async () => {
     try {
-        const [employees] = await pool.
+        const [employees] = await pool.query(`SELECT * FROM employee;`);
+        const employeeName = employees.map(
+            (employee) => `${employee.first_name} ${employee.last_name}`
+        );
+
+        const employee = await inquirer.prompt({
+            name: "employeeRemoved",
+            type: "list",
+            message: "Select an employee to remove:",
+            choices: [...employeeName],
+        });
+        const { employeeRemoved } = employee;
+
+        const checkEmployee = employees.find( 
+            (e) => `${e.first_name} ${last_name}` === employeeRemoved
+        );
+
+        if( checkEmployee.manager_id === NULL) {
+            const changeManager = employees.filter(
+                (e) => e.manager_id == checkEmployee.id
+            );
+
+            const updateManager = changeManager.map(
+                (name) => `${name.first_name} ${name.last_name}`
+            );
+            updateManager.forEach(async (name) => {
+                await pool.query(
+
+                    `
+                    UPDATE employee
+                    SET manager_is = NULL
+                    WHERE CONCAT(first_name, ' ', last_name) = ?;
+                    `,
+                    [name]
+                );
+            });
+        } else {
+            const changeManager = employees.filter(
+                (e) => e.manager_id == checkEmployee.id 
+            );
+            const updateManager = changeManager.map( (name) => 
+                (e) => `${name.first_name} $${name.last_name}`
+            );
+            updateManager.forEach(async (name) => {
+                await pool.query(
+                    `
+                    UPDATE employee 
+                    SET mananger_id = NULL
+                    WHERE CONCAT(first_name, ' ', last_name) =?;
+
+                    `,
+                    [name]
+                );
+            }); 
+        }
+
+        await pool.query(
+            `
+            DELETE FROM employee 
+            WHERE CONCAT(first_name, ' ', last_name) = ?;
+
+            `,
+            [employeeRemoved]
+        );
+
+        return await viewEmployees();
+    } catch (err) {
+        console.log(err);
     }
-}
+};
