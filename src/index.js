@@ -11,6 +11,7 @@ const pool = mysql
         database: "employee_tracker_db"
     })
     .promise();
+
 // "View All Departments" 
 const viewAllDepartments = async () => {
     const [rows] = await pool.query("SELECT * FROM department;");
@@ -83,7 +84,7 @@ const addDepartment = async () => {
 const addRole = async () => {
     try {
         const [departments] = await pool.query(`SELECT * FORM department;`);
-        const deptname = departments.map((dept) => dept.name).filter(arr => arr != null);
+        const deptName = departments.map((dept) => dept.name).filter(arr => arr != null);
         
         const role = await inquirer.prompt([
             {
@@ -99,7 +100,7 @@ const addRole = async () => {
             {
                 name:"roleSalary",
                 type: "input",
-                message: "Saalry of the role",
+                message: "Salary of the role",
                 validate: (salary) => {
                     return salary
                     ? true
@@ -110,12 +111,23 @@ const addRole = async () => {
                 name:"roleDeptName",
                 type: "list",
                 message: " Which deapartment does the role belong ",
-                choices: [... departments],
+                choices: [... deptName],
             
             },
           
         ]);
+        const { roleTitle, roleSalary, roleDeptName } = role;
 
+        const selectDept = departments.find((dept) => dept.name === roleDeptName);
+        const roleDeptId = selectDept.id;
 
+        await pool.query(
+            `INSERT INTO role (title, salary, department_id)
+            VALUES (?, ?, ?)`,
+            [roleTitle, roleSalary, roleDeptId]
+        );
+        return await viewRoles();
+    } catch (err) {
+        console.log(err);
     }
-}
+};
