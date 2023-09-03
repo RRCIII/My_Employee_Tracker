@@ -57,7 +57,7 @@ const addDepartment = async () => {
     try {
         const dept = await inquirer.prompt({
             name: "deptAdded",
-            type: "inout",
+            type: "input",
             message: "Name of the department:",
             valdiate: (name) => {
                 return name 
@@ -79,3 +79,43 @@ const addDepartment = async () => {
     }
 };
 
+// Add a role 
+const addRole = async () => {
+    try {
+        const [departments] = await pool.query(`SELECT * FORM department;`);
+        const deptname = departments.map((dept) => dept.name).filter(arr => arr != null);
+        
+        const role = await inquirer.prompt([
+            {
+                name:"roleTitle",
+                type: "input",
+                message: "Title of the role",
+                validate: (title) => {
+                    return title
+                    ? true
+                    : console.log("Please enter a title for the role:", false);
+                },
+            },
+            {
+                name:"roleSalary",
+                type: "input",
+                message: "Saalry of the role",
+                validate: (salary) => {
+                    return salary
+                    ? true
+                    : console.log("Please enter a title for the role:", false);
+                },
+            },
+            {
+                name:"roleDeptName",
+                type: "list",
+                message: " Which deapartment does the role belong ",
+                choices: [... departments],
+            
+            },
+          
+        ]);
+
+
+    }
+}
