@@ -376,12 +376,13 @@ const updateRole = async () => {
 
          await pool.query(
             `
-            UPDATE employee As e SET e.role_id = ?
+            UPDATE employee As e 
+            SET e.role_id = ?
             WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
             `,
             [id, updateEmployee]
          );
-         const [results] =await pool.query(
+         const [results] = await pool.query(
             `SELECT * FROM employee JOIN role ON employee.role_id = role.id;`
          );
          console.table(results);
@@ -390,3 +391,135 @@ const updateRole = async () => {
     }
 };
 
+// "Update Employee manager"
+const updateManager = async () => {
+    try {
+        const [employees] = await pool.query(`SELECT * FROM employee;`);
+        const employeeNames = employees.map(
+            (e) => `${e.first_name} ${last_name}`
+        );
+
+        const data = await inquirer.prompt([
+            {
+                name: "selectedEmployee",
+                type: "list",
+                message: 
+                "Select the employee who will be reassigned a different manager:",
+                choices: [...employeeNames, "NULL"],
+            },
+        ]);
+        const { selectedEmployee, managerSelected } = data;
+
+        if (managerSelected === "NULL") { 
+            await pool.query(
+                `
+                UPDATE employee AS e 
+                SET e.manager_id = NULL
+                WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+                
+                `,
+                [selectedEmployee]
+            );
+        } else  {
+            const { id } = employees.find(
+                (e) => `${e.first_name} ${e.last_name}` === managerSelected 
+            );
+        
+
+        await pool.query(
+            `
+            UPDATE employee AS e
+            set e.manager_id = NULL
+            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+
+            `,
+            [id, selectedEmployee]
+        );
+    }
+
+    return await viewEmployees();
+    } catch (err) {
+    console.log(err);
+}
+};
+
+// " View employees by manager"
+const viewByManager = async () => {
+    try {
+        const [result] = await pool.query(`
+        SELECT 
+        CONCAT (m.first_name ' ', m.last_name) AS manager_name, 
+        GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_names
+        FROM
+            employee e
+        JOIN 
+            employee m ON e.manager_id = m.id
+        GOURP BY 
+            m.id
+        ORDER BY
+        m.id;
+        `);
+        console.table(result)
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+// View employeee by department 
+const viewByDepartment = async () => {
+    try {
+        const [result] = await pool.query(`
+        SELECT 
+            d.name As dpartment, 
+            GROUP_CONCAT(CONAT(e.first_name, ' ', e.last_name)) AS employee_name 
+        FROM 
+            department d
+        JOIN
+            role r ON d.id = r.department_id
+        JOIN
+            employee e ON r.id = e.role_id 
+        WHERE
+            d.name IS NOT NULL
+        GROUP BY 
+            d.id
+        ORDER BY
+            d.id;
+        `);
+
+        console.table(result)
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+// "View total utitilied budget of department"
+const viewBudget = async () => {
+    constquery = `
+    SELECT d.name AS department_name, COALESCE(SUM(r.salary), 0) AS total_salary
+    FROM department d
+    JOIN role r ON d.id = r.department_id
+    JOIN employee e ON r.id = e.role_id
+    WHERE d.name IN NOT NULL
+    GROUP BY d.name;
+    
+    `;
+    const [result] = await pool.query(query);
+    console.table(result);
+};
+
+module.exports = {
+    viewDepartments,
+    viewRoles,
+    viewEmployees,
+    addDepartment,
+    addRole,
+    addEmployee,
+    updateManager,
+    removeDepartment,
+    removeRole,
+    removeEmployee,
+    updateRole,
+    viewByManager,
+    viewByDepartment,
+    viewBudget,
+  };
