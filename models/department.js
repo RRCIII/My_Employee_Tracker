@@ -26,7 +26,3 @@ Department.init({
 
 module.exports = Department;
 
-// CREATE TABLE IF NOT EXISTS department_db  (
-//     id INT NOT NULL PRIMARY KEY,
-//     name VARCHAR(30) NOT NULL
-// );

@@ -1,3 +1,4 @@
+-- created seeds to insert into table 
 INSERT INTO department (name)
 VALUES  ("Information Technology"), 
         ("Human Resources"), 
