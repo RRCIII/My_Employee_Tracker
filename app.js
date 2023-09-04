@@ -1,3 +1,4 @@
+//commonJS import statements 
 const inquirer = require("inquirer");
 const asciiArt = require("./src/ascii");
 const index = require("./src/index");
