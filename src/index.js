@@ -259,7 +259,7 @@ const removeRole = async () => {
         await pool.query (
             ` UPDATE role
             SET title= NULL, salary = NULL
-            WHERE title = ?
+            WHERE title = ?;
             `,
             [roleRemoved]
         );
@@ -381,7 +381,7 @@ const updateRole = async () => {
             `
             UPDATE employee As e 
             SET e.role_id = ?
-            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
             `,
             [id, updateEmployee]
          );
@@ -418,7 +418,7 @@ const updateManager = async () => {
                 `
                 UPDATE employee AS e 
                 SET e.manager_id = NULL
-                WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+                WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
                 
                 `,
                 [selectedEmployee]
@@ -433,7 +433,7 @@ const updateManager = async () => {
             `
             UPDATE employee AS e
             set e.manager_id = NULL
-            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
 
             `,
             [id, selectedEmployee]
@@ -457,7 +457,7 @@ const viewByManager = async () => {
             employee e
         JOIN 
             employee m ON e.manager_id = m.id
-        GOURP BY 
+        GROUP BY 
             m.id
         ORDER BY
         m.id;
@@ -502,7 +502,7 @@ const viewBudget = async () => {
     FROM department d
     JOIN role r ON d.id = r.department_id
     JOIN employee e ON r.id = e.role_id
-    WHERE d.name IN NOT NULL
+    WHERE d.name IS NOT NULL
     GROUP BY d.name;
     
     `;
