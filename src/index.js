@@ -87,14 +87,14 @@ const addDepartment = async () => {
 // "Add a role" 
 const addRole = async () => {
     try {
-        const [departments] = await pool.query(`SELECT * FORM department;`);
+        const [departments] = await pool.query(`SELECT * FROM department;`);
         const deptName = departments.map((dept) => dept.name).filter(arr => arr != null);
         
         const role = await inquirer.prompt([
             {
                 name:"roleTitle",
                 type: "input",
-                message: "Title of the role",
+                message: "Title of the role:",
                 validate: (title) => {
                     return title
                     ? true
@@ -104,7 +104,7 @@ const addRole = async () => {
             {
                 name:"roleSalary",
                 type: "input",
-                message: "Salary of the role",
+                message: "Salary of the role:",
                 validate: (salary) => {
                     return salary
                     ? true
@@ -114,7 +114,7 @@ const addRole = async () => {
             {
                 name:"roleDeptName",
                 type: "list",
-                message: " Which deapartment does the role belong ",
+                message: " Which department does the role belong to?",
                 choices: [... deptName],
             
             },
@@ -139,10 +139,10 @@ const addRole = async () => {
 //  "Add Employee "
 const addEmployee = async () => {
     try {
-        const [roles] = await pool.query(`SELECT * FROM role`);
+        const [roles] = await pool.query(`SELECT * FROM role;`);
         const roleTitle = roles.map((role) => role.title).filter(arr => arr != null);
 
-        const [managers] = await pool.query(`SELECT * FROM employee`);
+        const [managers] = await pool.query(`SELECT * FROM employee;`);
         const managerName = managers.map(
             (name) => `${name.first_name} ${name.last_name}`
         );
@@ -360,13 +360,13 @@ const updateRole = async () => {
             {
                 name: "updateEmployee",
                 type: "list",
-                message: "Which employee's role do you want to udate?",
+                message: "Which employee's role do you want to update?",
                 choices: [...selectEmployee],
             },
             {
                 name: "updateRole",
                 type: "list",
-                message: "Which employee's role do you want to udate?",
+                message: "Which employee's role do you want to update?",
                 choices: [...selectRole],
             },
          ]);
@@ -473,7 +473,7 @@ const viewByDepartment = async () => {
     try {
         const [result] = await pool.query(`
         SELECT 
-            d.name As dpartment, 
+            d.name AS department, 
             GROUP_CONCAT(CONAT(e.first_name, ' ', e.last_name)) AS employee_name 
         FROM 
             department d
