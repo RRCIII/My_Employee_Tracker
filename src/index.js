@@ -1,5 +1,4 @@
 //  Node packages: inquirer@8.2.4 & mysql2
-const { query } = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
