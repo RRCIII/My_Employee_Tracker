@@ -50,7 +50,7 @@ const promptInquirer = async () => {
     // Switch statements for what functions to be called, in order to query from the database
     switch (main) {
       case "view All departments":
-        index.viewDepartment().then(recallPrompt);
+        index.viewDepartments().then(recallPrompt);
         break;
       case "View All Roles":
         index.viewRoles().then(recallPrompt);
@@ -92,7 +92,7 @@ const promptInquirer = async () => {
         index.viewBudget().then(recallPrompt);
         break;
       case "Quit":
-        console.log("Oh, thank god!");
+        console.log("CLOSING TIME!");
         process.exit(0);
     }
   } catch (err) {

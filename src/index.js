@@ -3,15 +3,18 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 require('dotenv').config();
 
+
 // created a connection pool w/ mysql
 const pool = mysql
     .createPool({
         host: "127.0.0.1",
-        user: process.env.DB_NAME,
+        user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME
     })
     .promise();
+
+
 
 // "View All Departments" 
 const viewDepartments = async () => {
@@ -47,7 +50,7 @@ const viewEmployees = async () =>{
              d.name
         FROM employee e
         JOIN role r ON e.role_id = r.id
-        JOIN department dON r.department_id = d.id
+        JOIN department d ON r.department_id = d.id
         ORDER BY e.id; 
         `;
     const [rows] =await pool.query(query);

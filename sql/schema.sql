@@ -6,7 +6,7 @@ USE employee_tracker_data;
 -- tables created for department, role, and employee 
 CREATE TABLE department (
     id INT AUTO_INCREMENT, 
-    name VACHAR(30),
+    name VARCHAR(30),
     PRIMARY KEY (id)
 );
 
