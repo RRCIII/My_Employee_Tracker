@@ -19,7 +19,7 @@ const pool = mysql
 // "View All Departments" 
 const viewDepartments = async () => {
     const [rows] = await pool.query("SELECT * FROM department;");
-    console.table(rows)
+    console.table(rows);
 };
 
 // "View All Roles"
@@ -286,10 +286,10 @@ const removeEmployee = async () => {
         const { employeeRemoved } = employee;
 
         const checkEmployee = employees.find( 
-            (e) => `${e.first_name} ${last_name}` === employeeRemoved
+            (e) => `${e.first_name} ${e.last_name}` === employeeRemoved
         );
 
-        if( checkEmployee.manager_id === NULL) {
+        if( checkEmployee.manager_id === "NULL") {
             const changeManager = employees.filter(
                 (e) => e.manager_id == checkEmployee.id
             );
@@ -354,7 +354,7 @@ const updateRole = async () => {
         const [employeeRoles] = await pool.query(`SELECT * FROM role;`);
         const selectRole = employeeRoles
         .map((role) => role.title)
-        .filter((arr) => arr != NULL);
+        .filter((arr) => arr != null);
 
         const data = await inquirer.prompt([
             {
@@ -399,7 +399,7 @@ const updateManager = async () => {
     try {
         const [employees] = await pool.query(`SELECT * FROM employee;`);
         const employeeNames = employees.map(
-            (e) => `${e.first_name} ${last_name}`
+            (e) => `${e.first_name} ${e.last_name}`
         );
 
         const data = await inquirer.prompt([
@@ -432,7 +432,7 @@ const updateManager = async () => {
         await pool.query(
             `
             UPDATE employee AS e
-            set e.manager_id = NULL
+            set e.manager_id = ?
             WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
 
             `,
@@ -451,8 +451,8 @@ const viewByManager = async () => {
     try {
         const [result] = await pool.query(`
         SELECT 
-        CONCAT (m.first_name ' ', m.last_name) AS manager_name, 
-        GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_names
+            CONCAT(m.first_name, ' ', m.last_name) AS manager_name, 
+            GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_names
         FROM
             employee e
         JOIN 
@@ -460,7 +460,7 @@ const viewByManager = async () => {
         GROUP BY 
             m.id
         ORDER BY
-        m.id;
+            m.id;
         `);
         console.table(result)
     } catch (err) {
@@ -474,7 +474,7 @@ const viewByDepartment = async () => {
         const [result] = await pool.query(`
         SELECT 
             d.name AS department, 
-            GROUP_CONCAT(CONAT(e.first_name, ' ', e.last_name)) AS employee_name 
+            GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_name 
         FROM 
             department d
         JOIN

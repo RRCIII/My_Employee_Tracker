@@ -26,7 +26,7 @@ const promptInquirer = async () => {
       message: "What would you like to do?",
       type: "list",
       choices: [
-        "view All Departments",
+        "View All Departments",
         "View All Roles",
         "View All Employees",
         "Add a department",
@@ -49,7 +49,7 @@ const promptInquirer = async () => {
 
     // Switch statements for what functions to be called, in order to query from the database
     switch (main) {
-      case "view All departments":
+      case "View All departments":
         index.viewDepartments().then(recallPrompt);
         break;
       case "View All Roles":
