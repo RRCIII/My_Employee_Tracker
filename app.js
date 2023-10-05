@@ -8,7 +8,7 @@ const startTracker = () => {
   asciiArt();
   setTimeout(() => {
     promptInquirer();
-  }, 1550);
+  }, 1500);
 };
 
 // Function for going back to the main prompts after 500 milliseconds
