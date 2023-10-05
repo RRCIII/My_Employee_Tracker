@@ -1,9 +1,9 @@
-//commonJS import statements 
+// CommonJS import statements
 const inquirer = require("inquirer");
 const asciiArt = require("./src/ascii");
 const index = require("./src/index");
 
-// Start application with ASCII ART, including the main inquirer.js prompts
+// Start application with ASCII Art, followed by the main inquirer.js prompts
 const startTracker = () => {
   asciiArt();
   setTimeout(() => {
@@ -41,6 +41,14 @@ const promptInquirer = async () => {
         "View employees by department",
         "View total utilized budget of department",
         "Quit",
+        /*
+         Extra credit added:
+         "View employees by manager"
+         "view employees by department"
+         "Update employee managers"
+         "Delete departments, roles, and employees"
+         "View total utilized budget of department"
+        */
       ],
     });
 
@@ -49,7 +57,7 @@ const promptInquirer = async () => {
 
     // Switch statements for what functions to be called, in order to query from the database
     switch (main) {
-      case "View All departments":
+      case "View All Departments":
         index.viewDepartments().then(recallPrompt);
         break;
       case "View All Roles":
@@ -92,7 +100,7 @@ const promptInquirer = async () => {
         index.viewBudget().then(recallPrompt);
         break;
       case "Quit":
-        console.log("CLOSING TIME!");
+        console.log("Oh, thank god!");
         process.exit(0);
     }
   } catch (err) {
