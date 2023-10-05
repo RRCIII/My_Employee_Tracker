@@ -6,7 +6,7 @@ Node.js content management systems application that views and manages employees 
 
 ## Video Demonstration of Application
 
-- [Click Here]()
+- [Click Here](https://drive.google.com/file/d/1_JCV873bU2RbxlnTNVt_buaLpgCzrkGM/view)
 
 ## Installation
 
