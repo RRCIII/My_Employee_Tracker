@@ -1,6 +1,7 @@
 // Node packages: inquirer@8.2.4 & mysql2
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+require('dotenv').config();
 
 // Create a connection pool with mysql2
 const pool = mysql
