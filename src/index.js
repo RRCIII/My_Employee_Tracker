@@ -1,528 +1,527 @@
-//  Node packages: inquirer@8.2.4 & mysql2
+// Node packages: inquirer@8.2.4 & mysql2
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-require('dotenv').config();
 
-
-// created a connection pool w/ mysql
+// Create a connection pool with mysql2
 const pool = mysql
-    .createPool({
-        host: "127.0.0.1",
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-    })
-    .promise();
+  .createPool({
+    host: "127.0.0.1",
+    user: "root",
+    password: "",
+    database: "employee_tracker_db",
+  })
+  .promise();
 
-
-
-// "View All Departments" 
+// "View All Departments"
 const viewDepartments = async () => {
-    const [rows] = await pool.query("SELECT * FROM department;");
-    console.table(rows);
+  const [rows] = await pool.query("SELECT * FROM department;");
+  console.table(rows);
 };
 
 // "View All Roles"
 const viewRoles = async () => {
-    let query = `
-    SELECT r.id,
-           r.title,
-           r.salary,
-           r.department_id,
-           d.name
+  let query = `
+    SELECT  r.id,
+            r.title,
+            r.salary,
+            r.department_id,
+            d.name
     FROM role r
     JOIN department d ON r.department_id = d.id;
-    `;
+  `;
 
-    const [rows] = await pool.query(query);
-    console.table(rows);
+  const [rows] = await pool.query(query);
+  console.table(rows);
 };
 
-//"View All Employess"
-const viewEmployees = async () =>{
-    let query = ` 
-      SELECT e.id,
-             e.first_name,
-             e.last_name,
-             e.manager_id,
-             r.title,
-             r.salary,
-             d.name
-        FROM employee e
-        JOIN role r ON e.role_id = r.id
-        JOIN department d ON r.department_id = d.id
-        ORDER BY e.id; 
-        `;
-    const [rows] =await pool.query(query);
-    console.table(rows);
+// "View All Employees"
+const viewEmployees = async () => {
+  let query = `
+    SELECT  e.id,
+            e.first_name,
+            e.last_name,
+            e.manager_id,
+            r.title,
+            r.salary,
+            d.name
+    FROM employee e
+    JOIN role r ON e.role_id = r.id
+    JOIN department d ON r.department_id = d.id
+    ORDER BY e.id;
+  `;
+
+  const [rows] = await pool.query(query);
+  console.table(rows);
 };
 
 // "Add a department"
 const addDepartment = async () => {
-    try {
-        const dept = await inquirer.prompt({
-            name: "deptAdded",
-            type: "input",
-            message: "Name of the department:",
-            valdiate: (name) => {
-                return name 
-                ? true
-                : console.log("Please enter a name for the department:", false);
-            },
-        });
-        const { deptAdded } = dept;
+  try {
+    const dept = await inquirer.prompt({
+      name: "deptAdded",
+      type: "input",
+      message: "Name of the department:",
+      validate: (name) => {
+        return name
+          ? true
+          : console.log("Please enter a name for the department:", false);
+      },
+    });
+    const { deptAdded } = dept;
 
-        await pool.query(
-            `
-            INSERT INTO department (name)
-            VALUES (?)`,
-            [deptAdded]
-        );
-        return viewDepartments();
-    } catch (err) {
-        console.log(err);
-    }
+    await pool.query(
+      `
+        INSERT INTO department (name) 
+        VALUES (?)`,
+      [deptAdded]
+    );
+    return viewDepartments();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-// "Add a role" 
+// "Add a role"
 const addRole = async () => {
-    try {
-        const [departments] = await pool.query(`SELECT * FROM department;`);
-        const deptName = departments.map((dept) => dept.name).filter(arr => arr != null);
-        
-        const role = await inquirer.prompt([
-            {
-                name:"roleTitle",
-                type: "input",
-                message: "Title of the role:",
-                validate: (title) => {
-                    return title
-                    ? true
-                    : console.log("Please enter a title for the role:", false);
-                },
-            },
-            {
-                name:"roleSalary",
-                type: "input",
-                message: "Salary of the role:",
-                validate: (salary) => {
-                    return salary
-                    ? true
-                    : console.log("Please enter a title for the role:", false);
-                },
-            },
-            {
-                name:"roleDeptName",
-                type: "list",
-                message: " Which department does the role belong to?",
-                choices: [... deptName],
-            
-            },
-          
-        ]);
-        const { roleTitle, roleSalary, roleDeptName } = role;
+  try {
+    const [departments] = await pool.query(`SELECT * FROM department;`);
+    const deptName = departments.map((dept) => dept.name).filter(arr => arr != null);
 
-        const selectDept = departments.find((dept) => dept.name === roleDeptName);
-        const roleDeptId = selectDept.id;
+    const role = await inquirer.prompt([
+      {
+        name: "roleTitle",
+        type: "input",
+        message: "Title of the role:",
+        validate: (title) => {
+          return title
+            ? true
+            : console.log("Please enter a title for the role:", false);
+        },
+      },
+      {
+        name: "roleSalary",
+        type: "input",
+        message: "Salary of the role:",
+        validate: (salary) => {
+          return salary
+            ? true
+            : console.log("Please enter a salary for the role:", false);
+        },
+      },
+      {
+        name: "roleDeptName",
+        type: "list",
+        message: "Which department does the role belongs to?",
+        choices: [...deptName],
+      },
+    ]);
+    const { roleTitle, roleSalary, roleDeptName } = role;
 
-        await pool.query(
-            `INSERT INTO role (title, salary, department_id)
-            VALUES (?, ?, ?)`,
-            [roleTitle, roleSalary, roleDeptId]
-        );
-        return await viewRoles();
-    } catch (err) {
-        console.log(err);
-    }
+    const selectedDept = departments.find((dept) => dept.name === roleDeptName);
+    const roleDeptId = selectedDept.id;
+
+    await pool.query(
+      `INSERT INTO role (title, salary, department_id) 
+      VALUES (?, ?, ?)`,
+      [roleTitle, roleSalary, roleDeptId]
+    );
+    return await viewRoles();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-//  "Add Employee "
+// "Add an Employee"
 const addEmployee = async () => {
-    try {
-        const [roles] = await pool.query(`SELECT * FROM role;`);
-        const roleTitle = roles.map((role) => role.title).filter(arr => arr != null);
+  try {
+    const [roles] = await pool.query(`SELECT * FROM role;`);
+    const roleTitle = roles.map((role) => role.title).filter(arr => arr != null);
 
-        const [managers] = await pool.query(`SELECT * FROM employee;`);
-        const managerName = managers.map(
-            (name) => `${name.first_name} ${name.last_name}`
-        );
+    const [managers] = await pool.query(`SELECT * FROM employee;`);
+    const managerName = managers.map(
+      (name) => `${name.first_name} ${name.last_name}`
+    );
 
-        const employee =await inquirer.prompt([
-            {
-                name: "firstname",
-                type: "input",
-                messasge: "First name of the employee:",
-                validate: (first) => {
-                    return first 
-                    ? true 
-                    : console.log("Please enter a first name of the employee", false);
-                },
-            },
-            {
-                name: "lastname",
-                type: "input",
-                messasge: "Last name of the employee:",
-                validate: (last) => {
-                    return last
-                    ? true 
-                    : console.log("Please enter a last of the employee", false);
-                },
-            },
-            {
-                name: "employeeRole",
-                type: "list",
-                messasge: "What is the employee's role?:",
-                choices: [...roleTitle],
-            
-            },
-            {
-                name: "employeeManager",
-                type: "list",
-                messasge: "Who is the employee's manager:",
-                choices: [...managerName],
-            },
+    const employee = await inquirer.prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "First name of the employee:",
+        validate: (first) => {
+          return first
+            ? true
+            : console.log("Please enter a first name of the employee", false);
+        },
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "Last name of the employee:",
+        validate: (last) => {
+          return last
+            ? true
+            : console.log("Please enter a last name of the employee", false);
+        },
+      },
+      {
+        name: "employeeRole",
+        type: "list",
+        message: "What is the employee's role?",
+        choices: [...roleTitle],
+      },
+      {
+        name: "employeeManager",
+        type: "list",
+        message: "Who is the employee's manager?",
+        choices: [...managerName],
+      },
+    ]);
+    const { firstName, lastName, employeeRole, employeeManager } = employee;
 
-        ]);
-        const {  firstName, lastName, employeeRole, employeeManager } = employee;
+    const selectedRole = roles.find((role) => role.title === employeeRole);
+    const roleId = selectedRole.id;
 
-        const selectedRole = roles.find((role) => role.title === employeeRole);
-        const roleId = selectedRole.id 
+    const selectedManager = managers.find(
+      (manager) =>
+        `${manager.first_name} ${manager.last_name}` === employeeManager
+    );
+    const managerId = selectedManager.id;
 
-        const selectedManager = managers.find(
-            (manager) => 
-            `${manager.first_name} ${manager.last_name}` === employeeManager
-
-        );
-
-        const managerId = selectedManager.id;
-
-        await pool.query(
-            `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-            VALUES ( ?, ?, ?, ?)`,
-            [firstName, lastName, roleId, managerId]
-        );
-        return await viewEmployees();
-    } catch (err) {
-        console.log(err);
-    }
+    await pool.query(
+      `INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+      VALUES (?, ?, ?, ?)`,
+      [firstName, lastName, roleId, managerId]
+    );
+    return await viewEmployees();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-//"Remove a department"
+// "Remove a department"
 const removeDepartment = async () => {
-    try {
-        const [departments] = await pool.query(`SELECT * FROM department;`);
-        const deptName = departments 
-        .map((dept) => dept.name)
-        .filter((arr) => arr != null);
+  try {
+    const [departments] = await pool.query(`SELECT * FROM department;`);
+    const deptName = departments
+      .map((dept) => dept.name)
+      .filter((arr) => arr != null);
 
-        const dept = await inquirer.prompt({
-            name: "deptRemoved",
-            type: "list",
-            message: "Select a department to remove:",
-            choices: [...deptName],
-        });
-        const { deptRemoved } = dept;
+    const dept = await inquirer.prompt({
+      name: "deptRemoved",
+      type: "list",
+      message: "Select a department to remove:",
+      choices: [...deptName],
+    });
+    const { deptRemoved } = dept;
 
-        await pool.query(`UPDATE department SET name = NULL WHERE name = ?;`, [
-            deptRemoved,
-        ]);
+    await pool.query(`UPDATE department SET name = NULL WHERE name = ?;`, [
+      deptRemoved,
+    ]);
 
-        await pool.query(
-        `
-        DELETE FROM department WHERE name = ?;
-        `,
-            [deptRemoved]
-        );
+    await pool.query(
+      `
+    DELETE FROM department WHERE name = ?;
+    `,
+      [deptRemoved]
+    );
 
-        return await viewDepartments();
-    } catch (err) {
-        console.log(err);
-    }
+    return await viewDepartments();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // "Remove a role"
 const removeRole = async () => {
-    try {
-        const [roles] = await pool.query(`Select * FROM role;`);
-        const roleTitle = roles 
-            .map((role) => role.title)
-            .filter((arr) => arr != null);
+  try {
+    const [roles] = await pool.query(`SELECT * FROM role;`);
+    const roleTitle = roles
+      .map((role) => role.title)
+      .filter((arr) => arr != null);
 
-        const role = await inquirer.prompt({
-            name: "roleRemoved",
-            type: "list",
-            message: "Select a role to remove:",
-            choices: [...roleTitle],
-        });
-        const { roleRemoved } = role;
+    const role = await inquirer.prompt({
+      name: "roleRemoved",
+      type: "list",
+      message: "Select a role to remove:",
+      choices: [...roleTitle],
+    });
+    const { roleRemoved } = role;
 
-        await pool.query (
-            ` UPDATE role
-            SET title= NULL, salary = NULL
-            WHERE title = ?;
-            `,
-            [roleRemoved]
-        );
-        return await viewRoles();
-    } catch (err) {
-        console.log(err);
-    }
+    await pool.query(
+      `
+      UPDATE role 
+      SET title = NULL, salary = NULL
+      WHERE title = ? 
+      `,
+      [roleRemoved]
+    );
+
+    await pool.query(
+      `
+    DELETE FROM role WHERE title = ?;
+    `,
+      [roleRemoved]
+    );
+
+    return await viewRoles();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // "Remove an employee"
 const removeEmployee = async () => {
-    try {
-        const [employees] = await pool.query(`SELECT * FROM employee;`);
-        const employeeName = employees.map(
-            (employee) => `${employee.first_name} ${employee.last_name}`
-        );
+  try {
+    const [employees] = await pool.query(`SELECT * FROM employee;`);
+    const employeeName = employees.map(
+      (employee) => `${employee.first_name} ${employee.last_name}`
+    );
 
-        const employee = await inquirer.prompt({
-            name: "employeeRemoved",
-            type: "list",
-            message: "Select an employee to remove:",
-            choices: [...employeeName],
-        });
-        const { employeeRemoved } = employee;
+    const employee = await inquirer.prompt({
+      name: "employeeRemoved",
+      type: "list",
+      message: "Select an employee to remove:",
+      choices: [...employeeName],
+    });
+    const { employeeRemoved } = employee;
 
-        const checkEmployee = employees.find( 
-            (e) => `${e.first_name} ${e.last_name}` === employeeRemoved
-        );
+    const checkEmployee = employees.find(
+      (e) => `${e.first_name} ${e.last_name}` === employeeRemoved
+    );
 
-        if( checkEmployee.manager_id === "NULL") {
-            const changeManager = employees.filter(
-                (e) => e.manager_id == checkEmployee.id
-            );
-
-            const updateManager = changeManager.map(
-                (name) => `${name.first_name} ${name.last_name}`
-            );
-            updateManager.forEach(async (name) => {
-                await pool.query(
-
-                    `
-                    UPDATE employee
-                    SET manager_is = NULL
-                    WHERE CONCAT(first_name, ' ', last_name) = ?;
-                    `,
-                    [name]
-                );
-            });
-        } else {
-            const changeManager = employees.filter(
-                (e) => e.manager_id == checkEmployee.id 
-            );
-            const updateManager = changeManager.map( (name) => 
-                (e) => `${name.first_name} $${name.last_name}`
-            );
-            updateManager.forEach(async (name) => {
-                await pool.query(
-                    `
-                    UPDATE employee 
-                    SET mananger_id = NULL
-                    WHERE CONCAT(first_name, ' ', last_name) =?;
-
-                    `,
-                    [name]
-                );
-            }); 
-        }
-
+    if (checkEmployee.manager_id === null) {
+      const changeManager = employees.filter(
+        (e) => e.manager_id == checkEmployee.id
+      );
+      const updateManager = changeManager.map(
+        (name) => `${name.first_name} ${name.last_name}`
+      );
+      updateManager.forEach(async (name) => {
         await pool.query(
-            `
-            DELETE FROM employee 
+          `
+            UPDATE employee
+            SET manager_id = NULL
             WHERE CONCAT(first_name, ' ', last_name) = ?;
-
-            `,
-            [employeeRemoved]
+          `,
+          [name]
         );
-
-        return await viewEmployees();
-    } catch (err) {
-        console.log(err);
+      });
+    } else {
+      const changeManager = employees.filter(
+        (e) => e.manager_id == checkEmployee.id
+      );
+      const updateManager = changeManager.map(
+        (name) => `${name.first_name} ${name.last_name}`
+      );
+      updateManager.forEach(async (name) => {
+        await pool.query(
+          `
+            UPDATE employee
+            SET manager_id = NULL
+            WHERE CONCAT(first_name, ' ', last_name) = ?;
+          `,
+          [name]
+        );
+      });
     }
+
+    await pool.query(
+      `
+        DELETE FROM employee 
+        WHERE CONCAT(first_name, ' ', last_name) = ?;
+      `,
+      [employeeRemoved]
+    );
+
+    return await viewEmployees();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // "Update an employee role"
 const updateRole = async () => {
-    try {
-        const [employeeNames] = await pool.query(`SELECT * FROM employee;`)
-        const selectEmployee = employeeNames.map(
-            (names) => `${names.first_name} ${names.last_name}`
-        );
+  try {
+    const [employeeNames] = await pool.query(`SELECT * FROM employee;`);
+    const selectEmployee = employeeNames.map(
+      (names) => `${names.first_name} ${names.last_name}`
+    );
 
-        const [employeeRoles] = await pool.query(`SELECT * FROM role;`);
-        const selectRole = employeeRoles
-        .map((role) => role.title)
-        .filter((arr) => arr != null);
+    const [employeeRoles] = await pool.query(`SELECT * FROM role;`);
+    const selectRole = employeeRoles
+      .map((role) => role.title)
+      .filter((arr) => arr != null);
 
-        const data = await inquirer.prompt([
-            {
-                name: "updateEmployee",
-                type: "list",
-                message: "Which employee's role do you want to update?",
-                choices: [...selectEmployee],
-            },
-            {
-                name: "updateRole",
-                type: "list",
-                message: "Which employee's role do you want to update?",
-                choices: [...selectRole],
-            },
-         ]);
-         const { updateEmployee, updateRole } = data;
+    const data = await inquirer.prompt([
+      {
+        name: "updateEmployee",
+        type: "list",
+        message: "Which employee's role do you want to update?",
+        choices: [...selectEmployee],
+      },
+      {
+        name: "updateRole",
+        type: "list",
+        message: "Which role do you want to assign to the selected employee?",
+        choices: [...selectRole],
+      },
+    ]);
+    const { updateEmployee, updateRole } = data;
 
-         const updateRoleId = employeeRoles.find(
-            (role) => role.title === updateRole 
-         );
-         const { id } = updateRoleId;
+    const updateRoleId = employeeRoles.find(
+      (role) => role.title === updateRole
+    );
+    const { id } = updateRoleId;
 
-         await pool.query(
-            `
-            UPDATE employee As e 
-            SET e.role_id = ?
-            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
-            `,
-            [id, updateEmployee]
-         );
-         const [results] = await pool.query(
-            `SELECT * FROM employee JOIN role ON employee.role_id = role.id;`
-         );
-         console.table(results);
-    } catch (err) {
-        console.log(err);
-    }
+    await pool.query(
+      `
+        UPDATE employee AS e
+        SET e.role_id = ?
+        WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+        `,
+      [id, updateEmployee]
+    );
+
+    const [results] = await pool.query(
+      `SELECT * FROM employee JOIN role ON employee.role_id = role.id;`
+    );
+    console.table(results);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-// "Update Employee manager"
+// "Update employee manager"
 const updateManager = async () => {
-    try {
-        const [employees] = await pool.query(`SELECT * FROM employee;`);
-        const employeeNames = employees.map(
-            (e) => `${e.first_name} ${e.last_name}`
-        );
+  try {
+    const [employees] = await pool.query(`SELECT * FROM employee;`);
+    const employeeNames = employees.map(
+      (e) => `${e.first_name} ${e.last_name}`
+    );
 
-        const data = await inquirer.prompt([
-            {
-                name: "selectedEmployee",
-                type: "list",
-                message: 
-                "Select the employee who will be reassigned a different manager:",
-                choices: [...employeeNames, "NULL"],
-            },
-        ]);
-        const { selectedEmployee, managerSelected } = data;
+    const data = await inquirer.prompt([
+      {
+        name: "selectedEmployee",
+        type: "list",
+        message:
+          "Select the employee who will be reassigned a different manager:",
+        choices: [...employeeNames],
+      },
+      {
+        name: "managerSelected",
+        type: "list",
+        message: "Reassign this employee's manager to:",
+        choices: [...employeeNames, "NULL"],
+      },
+    ]);
+    const { selectedEmployee, managerSelected } = data;
 
-        if (managerSelected === "NULL") { 
-            await pool.query(
-                `
-                UPDATE employee AS e 
-                SET e.manager_id = NULL
-                WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
-                
-                `,
-                [selectedEmployee]
-            );
-        } else  {
-            const { id } = employees.find(
-                (e) => `${e.first_name} ${e.last_name}` === managerSelected 
-            );
-        
+    if (managerSelected === "NULL") {
+      await pool.query(
+        `
+      UPDATE employee AS e
+      SET e.manager_id = NULL
+      WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+      `,
+        [selectedEmployee]
+      );
+    } else {
+      const { id } = employees.find(
+        (e) => `${e.first_name} ${e.last_name}` === managerSelected
+      );
 
-        await pool.query(
-            `
-            UPDATE employee AS e
-            set e.manager_id = ?
-            WHERE CONCAT(e.first_name, ' ', e.last_name) = ?;
-
-            `,
-            [id, selectedEmployee]
-        );
+      await pool.query(
+        `
+        UPDATE employee AS e
+        SET e.manager_id = ?
+        WHERE CONCAT(e.first_name, ' ', e.last_name) = ?
+        `,
+        [id, selectedEmployee]
+      );
     }
 
     return await viewEmployees();
-    } catch (err) {
+  } catch (err) {
     console.log(err);
-}
+  }
 };
 
-// " View employees by manager"
+// "View employees by manager"
 const viewByManager = async () => {
-    try {
-        const [result] = await pool.query(`
-        SELECT 
-            CONCAT(m.first_name, ' ', m.last_name) AS manager_name, 
-            GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_names
-        FROM
-            employee e
-        JOIN 
-            employee m ON e.manager_id = m.id
-        GROUP BY 
-            m.id
-        ORDER BY
-            m.id;
-        `);
-        console.table(result)
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    const [result] = await pool.query(`
+      SELECT
+        CONCAT(m.first_name, ' ', m.last_name) AS manager_name,
+        GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_names
+      FROM
+        employee e
+      JOIN
+        employee m ON e.manager_id = m.id
+      GROUP BY
+        m.id
+      ORDER BY
+        m.id;
+    `);
+    console.table(result)
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-// View employeee by department 
+// "View employees by department"
 const viewByDepartment = async () => {
-    try {
-        const [result] = await pool.query(`
-        SELECT 
-            d.name AS department, 
-            GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_name 
-        FROM 
-            department d
-        JOIN
-            role r ON d.id = r.department_id
-        JOIN
-            employee e ON r.id = e.role_id 
-        WHERE
-            d.name IS NOT NULL
-        GROUP BY 
-            d.id
-        ORDER BY
-            d.id;
-        `);
+  try {
+    const [result] = await pool.query(`
+      SELECT
+        d.name AS department,
+        GROUP_CONCAT(CONCAT(e.first_name, ' ', e.last_name)) AS employee_name
+      FROM
+        department d
+      JOIN
+        role r ON d.id = r.department_id
+      JOIN
+        employee e ON r.id = e.role_id
+      WHERE
+        d.name IS NOT NULL
+      GROUP BY
+        d.id
+      ORDER BY
+        d.id;
+    `)
 
-        console.table(result)
-    } catch (err) {
-        console.log(err);
-    }
-};
+    console.table(result)
+  } catch (err) {
+    console.log(err)
+  }
+}
 
-// "View total utitilied budget of department"
-const viewBudget = async () => { 
-    const query = `
+// "View total utilized budget of department"
+const viewBudget = async () => {
+  const query = `
     SELECT d.name AS department_name, COALESCE(SUM(r.salary), 0) AS total_salary
     FROM department d
     JOIN role r ON d.id = r.department_id
     JOIN employee e ON r.id = e.role_id
     WHERE d.name IS NOT NULL
     GROUP BY d.name;
-    
-    `;
-    const [result] = await pool.query(query);
-    console.table(result);
+  `;
+  const [result] = await pool.query(query);
+  console.table(result);
 };
 
 module.exports = {
-    viewDepartments,
-    viewRoles,
-    viewEmployees,
-    addDepartment,
-    addRole,
-    addEmployee,
-    updateManager,
-    removeDepartment,
-    removeRole,
-    removeEmployee,
-    updateRole,
-    viewByManager,
-    viewByDepartment,
-    viewBudget,
-  };
+  viewDepartments,
+  viewRoles,
+  viewEmployees,
+  addDepartment,
+  addRole,
+  addEmployee,
+  updateManager,
+  removeDepartment,
+  removeRole,
+  removeEmployee,
+  updateRole,
+  viewByManager,
+  viewByDepartment,
+  viewBudget,
+};
