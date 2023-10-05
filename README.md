@@ -34,7 +34,7 @@ SOURCE ./sql/schema.sql;
 SOURCE ./sql/seeds.sql;
 ```
 
-<img width="750px" src=""/>
+<img width="750px" src="./img/Screenshot_employeeTraker_mysqlDB.png"/>
 
 - #### Start the application from the terminal with:
 
@@ -42,11 +42,11 @@ SOURCE ./sql/seeds.sql;
 npm run start
 ```
 
-<img src="" />
+<img src="./img/Screenshot_employeeTraker_start.png" />
 
 <br>
 
-<img src="" />
+<img src="./img/Screenshot_employeeTraker_viewAll.png" />
 
 ## Credits
 
