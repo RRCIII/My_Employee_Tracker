@@ -34,7 +34,7 @@ SOURCE ./sql/schema.sql;
 SOURCE ./sql/seeds.sql;
 ```
 
-<img width="750px" src=""
+<img width="750px" src=""/>
 
 - #### Start the application from the terminal with:
 
